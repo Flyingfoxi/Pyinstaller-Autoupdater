@@ -34,7 +34,7 @@ class Updater:
                  repository: str,
                  assets_name: str = "dist-{}",
                  executable: str = find_executable(),
-                 destination: str = find_executable(),
+                 destination: str = os.path.dirname(find_executable()),
                  check_now: bool = True
                  ):
         self.update_available = False

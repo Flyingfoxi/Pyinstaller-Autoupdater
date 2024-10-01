@@ -9,7 +9,7 @@ import platform
 import subprocess
 import tempfile
 
-IS_WINDOWS = (platform.system() == "windows")
+IS_WINDOWS = (platform.system() == "Windows")
 
 script_windows = '''
 @echo off
@@ -29,9 +29,9 @@ if exist "%dir%" (
 )
 
 mkdir "%dest%"
-echo Unzipping "$zip"
-tar -xf "$zip" -C "$dest"
-del "$zip"
+echo Unzipping "%zip%"
+tar -xf "%zip%" -C "%dest%"
+del "%zip%"
 echo Sucessfully finished
 
 endlocal
