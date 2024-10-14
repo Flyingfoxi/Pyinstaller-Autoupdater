@@ -3,7 +3,7 @@
 filename:   script_worker.py
 project:    Pyinstaller-Autoupdater
 """
-
+import logging
 import os
 import platform
 import subprocess
@@ -64,6 +64,8 @@ exit
 
 
 def create_script(executable, zip_location, destination):
+    _logger = logging.getLogger("py-autoupdater")
+    _logger.debug(msg=("Using Batch Script" if IS_WINDOWS else "Using Bash Script"))
     script = (script_windows if IS_WINDOWS else script_unix)
     script = script.format(
             dir=os.path.abspath(os.path.dirname(executable)),
@@ -71,7 +73,8 @@ def create_script(executable, zip_location, destination):
             destination=destination
     )
 
-    script_location = os.path.join(tempfile.gettempdir(), f"update-script-for-agenda.{"bat" if IS_WINDOWS else "sh"}")
+    script_location = os.path.join(tempfile.gettempdir(), f"update-script.{"bat" if IS_WINDOWS else "sh"}")
+    _logger.info(msg=f"Saved Script to {script_location}")
 
     with open(script_location, "w") as f:
         f.write(script)
@@ -82,3 +85,4 @@ def create_script(executable, zip_location, destination):
     else:
         subprocess.run(["chmod", "777", script_location])
         subprocess.Popen(["bash", script_location])
+    _logger.debug(msg="script started")

@@ -11,7 +11,3 @@ class InvalidRepository(ValueError):
     def __init__(self, owner, repo):
         message = f"The user \"{owner}\" doesn't have a repository named \"{repo}\""
         super().__init__(message)
-
-
-class Invalid(ValueError):
-    ...

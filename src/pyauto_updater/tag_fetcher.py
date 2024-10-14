@@ -3,7 +3,7 @@
 filename:   tag_fetcher.py
 project:    Pyinstaller-Autoupdater
 """
-
+import logging
 import os
 import tempfile
 
@@ -16,6 +16,7 @@ tag_form = dict[str: str]
 
 def get_latest_release(owner: str, repo: str) -> tag_form | None:
     url = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
+    logging.getLogger("py-autoupdater").debug(f"getting latest release from {url}")
     with _requests.get(url) as response:
         if response.status_code == 200:
             try:
@@ -24,6 +25,7 @@ def get_latest_release(owner: str, repo: str) -> tag_form | None:
                 raise ValueError("unable to parse response") from ex
 
         else:
+            logging.getLogger("py-autoupdater").exception(msg=f"Failed to obtain latest release, status code: {response.status_code}")
             raise _InvalidRepo(owner, repo)
     return release
 
@@ -53,11 +55,12 @@ def download_zip(url, file):
     temp_zip = os.path.join(tempfile.gettempdir(), file)
 
     with _requests.get(url, stream=True) as response:
-        response.raise_for_status()
+        if response.status_code == 200:
 
-        with open(temp_zip, "wb") as f:
-            for chunk in response.iter_content(chunk_size=8192):  # Download in chunks
-                if chunk:
-                    f.write(chunk)
-
+            with open(temp_zip, "wb") as f:
+                for chunk in response.iter_content(chunk_size=8192):  # Download in chunks
+                    if chunk:
+                        f.write(chunk)
+        else:
+            logging.getLogger("py-autoupdater").exception(f"Error during file download, status code: {response.status_code}")
     return temp_zip
