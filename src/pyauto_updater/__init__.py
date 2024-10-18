@@ -35,7 +35,7 @@ class Logger(logging.Logger):
         )
 
         file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+        file_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
         self.addHandler(file_handler)
 
 
@@ -77,6 +77,7 @@ class Updater:
         self.assets_name = assets_name.format(platform.system()) + ".zip"
         self.executable = executable
         self.destination = destination
+        self.log_file = log_file
 
         if check_now:
             self._check_for_update()
@@ -105,7 +106,7 @@ class Updater:
 
             file = tag_fetcher.download_zip(url, name)
             self._logger.info(f"Saved ZIP file to {file}")
-            script_worker.create_script(self.executable, file, self.destination)
+            script_worker.create_script(self.executable, file, self.destination, self.log_file)
 
             self._logger.info(f"Saved Script, exiting ...")
             # exiting to let the subprocess.Popen to delete the executable
